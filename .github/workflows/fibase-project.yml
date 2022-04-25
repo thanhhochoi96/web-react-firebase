@@ -51,5 +51,4 @@ jobs:
         with:
           args: deploy --only hosting
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          FIREBASE_TOKEN: 1//0ekw6aPAvG73DCgYIARAAGA4SNwF-L9Irz4RZAivyfEezVzkRejkPVZGYnBOJ6ZTDJoCec_CyH8bKlsGvLFn4thMRVIMg75OjIRM
