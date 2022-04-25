@@ -32,13 +32,6 @@ jobs:
         with:
           name: build
           path: build
-  deploy:
-    name: Deploy
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@master
       - name: Download Artifact
         uses: actions/download-artifact@master
         with:
@@ -49,4 +42,4 @@ jobs:
         with:
           args: deploy --only hosting --project staging
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_TOKEN: 1//0ekw6aPAvG73DCgYIARAAGA4SNwF-L9Irz4RZAivyfEezVzkRejkPVZGYnBOJ6ZTDJoCec_CyH8bKlsGvLFn4thMRVIMg75OjIRM
