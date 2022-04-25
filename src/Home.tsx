@@ -7,6 +7,12 @@ export const Home = () => {
         environment for deployment. Running firebase deploy will deploy your app
         to that environment.
       </p>
+      <br></br>
+      <p>
+        Once you’ve created a new alias, it will be set as the current
+        environment for deployment. Running firebase deploy will deploy your app
+        to that environment.
+      </p>
     </>
   );
 };
