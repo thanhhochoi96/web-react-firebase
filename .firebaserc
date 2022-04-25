@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "sl-base-project"
-  }
+    "default": "sl-base-project",
+    "staging": "fir-github-de1c6"
+  },
+  "targets": {}
 }
