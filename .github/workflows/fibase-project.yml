@@ -29,6 +29,11 @@ jobs:
         run: npm install
       - run: npm ci
       - run: npm run build
+      - name: Archive Production Artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: dist
+          path: dist
   deploy:
      name: Deploy
      needs: build
