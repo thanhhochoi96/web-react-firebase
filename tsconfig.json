@@ -15,7 +15,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-
+    "paths": {
+      "@/*": ["./public/*"]
+    },
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "removeComments": true,
