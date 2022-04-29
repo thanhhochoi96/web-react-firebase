@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import images from "./assets/index";
 import classNames from "classnames";
 
@@ -57,6 +57,7 @@ export const Home = () => {
   const [runTurnNumber, setRunTurnNumber] = useState({ value: 1 });
   let timeRunInterval = useRef(80);
   let loopNumber = useRef(0);
+  let isStopCallAnimationCoinCounter = useRef(true);
 
   const handleBet = (itemKey: number) => {
     setIsOpenResult(false);
@@ -118,11 +119,8 @@ export const Home = () => {
     setIsOpenResult(false);
   };
 
-  useEffect(() => {
-    if (isRunCounter) animationCoinCounter(coinIsRunTurn);
-  }, [isRunCounter]);
-
   const animationCoinCounter = (coin: number) => {
+    isStopCallAnimationCoinCounter.current = false;
     setCoinCounter({ ...coinCounter, value: coin });
     let count = 0;
     const coinReceive = betValueState[result] * multipleNumber;
@@ -137,6 +135,11 @@ export const Home = () => {
       ++count;
     }, 100);
   };
+
+  if (isRunCounter && isStopCallAnimationCoinCounter.current) {
+    animationCoinCounter(coinIsRunTurn);
+    console.log("hi");
+  }
 
   const handleEndBet = (result: number) => {
     const coinReceive = betValueState[result] * multipleNumber;
@@ -233,6 +236,7 @@ export const Home = () => {
           </div>
         );
       }
+      return null;
     });
 
     return <div className="inner">{listResultScreen}</div>;
