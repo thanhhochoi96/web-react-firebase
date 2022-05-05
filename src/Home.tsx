@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import images from "./assets/index";
 import classNames from "classnames";
 
@@ -23,21 +23,21 @@ const betValueDefault: BetValueInterface = {
 
 const resultAreaNumber = 13;
 
-const betResultScreen = [
-  1,
-  2,
-  3,
-  4,
-  12,
-  5,
-  11,
-  resultAreaNumber,
-  6,
-  10,
-  9,
-  8,
-  7,
-];
+const betResultScreen = new Map([
+  [1, "bi bi-alarm-fill"],
+  [2, "bi bi-signpost-fill"],
+  [3, "bi bi-bag-fill"],
+  [4, "bi bi-bell-fill"],
+  [12, "bi bi-suit-heart-fill"],
+  [5, "bi bi-square-fill"],
+  [11, "bi bi-camera-reels-fill"],
+  [resultAreaNumber, ""],
+  [6, "bi bi-cart-fill"],
+  [10, "bi bi-cloud-fill"],
+  [9, "bi bi-display-fill"],
+  [8, "bi bi-emoji-smile-fill"],
+  [7, "bi bi-star-fill"],
+]);
 
 const coinInitial = 10;
 const multipleNumber = 12;
@@ -57,10 +57,11 @@ export const Home = () => {
   const [runTurnNumber, setRunTurnNumber] = useState({ value: 1 });
   let timeRunInterval = useRef(80);
   let loopNumber = useRef(0);
+  let isStopCallAnimationCoinCounter = useRef(true);
 
   const handleBet = (itemKey: number) => {
-    setIsOpenResult(false);
     if (isLoadingResult || !isEnoughMoney) return;
+    setIsOpenResult(false);
     const betValue = isOpenResult ? betValueDefault : betValueState;
     const valueOld = betValue[itemKey] || 0;
     const betValueStateNew = { ...betValue, [itemKey]: valueOld + 1 };
@@ -82,7 +83,9 @@ export const Home = () => {
     for (let item = numberStart; item <= numberEnd; item++) {
       listItem.push(
         <div key={item} className="item" onClick={() => handleBet(item)}>
-          <span className="number">{item}</span>
+          <span className="number">
+            <i className={betResultScreen.get(item)} />
+          </span>
           <img src={images.button_item} alt="item" />
         </div>
       );
@@ -118,18 +121,17 @@ export const Home = () => {
     setIsOpenResult(false);
   };
 
-  useEffect(() => {
-    if (isRunCounter) animationCoinCounter(coinIsRunTurn);
-  }, [isRunCounter]);
-
   const animationCoinCounter = (coin: number) => {
+    isStopCallAnimationCoinCounter.current = false;
     setCoinCounter({ ...coinCounter, value: coin });
     let count = 0;
     const coinReceive = betValueState[result] * multipleNumber;
-    setInterval(() => {
+    const interval = setInterval(() => {
       if (count === coinReceive) {
         setCoinCounter({ ...coinCounter, value: 0 });
         setIsRunCounter(false);
+        isStopCallAnimationCoinCounter.current = true;
+        clearInterval(interval);
         return;
       }
       ++coinCounter.value;
@@ -137,6 +139,10 @@ export const Home = () => {
       ++count;
     }, 100);
   };
+
+  if (isRunCounter && isStopCallAnimationCoinCounter.current) {
+    animationCoinCounter(coinIsRunTurn);
+  }
 
   const handleEndBet = (result: number) => {
     const coinReceive = betValueState[result] * multipleNumber;
@@ -178,11 +184,12 @@ export const Home = () => {
   };
 
   const start = () => {
+    if (isLoadingResult) return;
     if (isOpenResult) {
       clearBet();
       setIsOpenResult(false);
     }
-    if (coinMiss < coin && !isLoadingResult) {
+    if (coinMiss < coin) {
       setCoinIsRunTurn(coinMiss);
       setIsLoadingResult(true);
       const result = Math.floor(Math.random() * 12 + 1);
@@ -204,12 +211,12 @@ export const Home = () => {
 
   const renderBetResultScreen = () => {
     const listResultScreen: JSX.Element[] = [];
-    betResultScreen.map((item: number) => {
-      if (item === resultAreaNumber) {
+    betResultScreen.forEach((item: string, key: number) => {
+      if (key === resultAreaNumber) {
         listResultScreen.push(
-          <div key={item} className="item-result-center">
+          <div key={key} className="item-result-center">
             {!isLoadingResult && isOpenResult ? (
-              result
+              <i className={betResultScreen.get(result)} />
             ) : (
               <div className="spinner-grow" role="status">
                 <span className="sr-only"></span>
@@ -220,16 +227,16 @@ export const Home = () => {
       } else {
         listResultScreen.push(
           <div
-            key={item}
+            key={key}
             className={classNames(
               "item-result",
               {
-                active: runTurnNumber.value === item,
+                active: runTurnNumber.value === key,
               },
-              { selected: betValueState[item] }
+              { selected: betValueState[key] }
             )}
           >
-            {item}
+            <i className={item} />
           </div>
         );
       }
