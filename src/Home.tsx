@@ -240,6 +240,7 @@ export const Home = () => {
           </div>
         );
       }
+      return null;
     });
 
     return <div className="inner">{listResultScreen}</div>;
