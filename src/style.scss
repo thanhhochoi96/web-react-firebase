@@ -3,13 +3,79 @@
   .game-box {
     width: 850px;
     margin: auto;
+    text-align: center;
   }
 
   .start-clear {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 35px;
+    justify-content: center;
+    margin: 26px 0;
+    position: relative;
+
+    .item-wrapper {
+      display: flex;
+      align-items: center;
+      margin: 0 25px;
+      & > * {
+        margin: 0 10px;
+      }
+    }
+
+    .bet-result {
+      width: 150px;
+      height: 55px;
+      background: #cd3b3b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      line-height: 1;
+      color: #fff;
+      border: 5px solid #d8b5b5;
+      border-radius: 10px;
+
+      &.active {
+        background: #80002f;
+      }
+
+      &.result {
+        animation: flickerAnimationLR 0.5s infinite;
+      }
+    }
+
+    .button-bet {
+      box-shadow: 0 0 5px 1px #000;
+      border-radius: 50%;
+      max-width: 50px;
+      position: relative;
+      cursor: pointer;
+
+      img {
+        width: 100%;
+      }
+
+      .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 26px;
+        color: #604f4d;
+        user-select: none;
+        font-size: 20px;
+        line-height: 1;
+        color: #212529;
+      }
+
+      &:active {
+        box-shadow: 0 0 1px 1px #000;
+
+        .label {
+          transform: translate(-50%, -50%) scale(0.9);
+        }
+      }
+    }
 
     img {
       cursor: pointer;
@@ -23,10 +89,14 @@
 
     .button_start {
       max-width: 70px;
+      position: absolute;
+      right: 0;
     }
 
     .button_clear {
       max-width: 60px;
+      position: absolute;
+      left: 0;
     }
   }
 
@@ -167,6 +237,18 @@
   }
   50% {
     background: transparent;
+  }
+  100% {
+    background-color: #34ae3b;
+  }
+}
+
+@keyframes flickerAnimationLR {
+  0% {
+    background-color: #34ae3b;
+  }
+  50% {
+    background: #cd3b3b;
   }
   100% {
     background-color: #34ae3b;

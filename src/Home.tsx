@@ -21,6 +21,14 @@ const betValueDefault: BetValueInterface = {
   12: 0,
 };
 
+const leftSide = 1;
+const rightSide = 2;
+
+const betValueLeftRightDefault: BetValueInterface = {
+  [leftSide]: 0,
+  [rightSide]: 0,
+};
+
 const resultAreaNumber = 13;
 
 const betResultScreen = new Map([
@@ -39,12 +47,15 @@ const betResultScreen = new Map([
   [7, "bi bi-star-fill"],
 ]);
 
-const coinInitial = 10;
+const coinInitial = 12;
 const multipleNumber = 12;
 
 export const Home = () => {
   const [betValueState, setBetValueState] =
     useState<BetValueInterface>(betValueDefault);
+  const [betLRValueState, setBetLRValueState] = useState<BetValueInterface>(
+    betValueLeftRightDefault
+  );
   const [coin, setCoin] = useState(coinInitial);
   const [coinCounter, setCoinCounter] = useState({ value: 0 });
   const [coinMiss, setCoinMiss] = useState(coinInitial);
@@ -59,21 +70,57 @@ export const Home = () => {
   let loopNumber = useRef(0);
   let isStopCallAnimationCoinCounter = useRef(true);
 
+  const getSumbet = (
+    bottomBet: BetValueInterface = betValueState,
+    aboveBet: BetValueInterface = betLRValueState
+  ) => {
+    let sumBet = 0;
+    for (let item = 1; item <= 12; item++) {
+      sumBet += bottomBet[item];
+    }
+
+    const sumBetLR = aboveBet[leftSide] + aboveBet[rightSide];
+
+    return sumBet + sumBetLR;
+  };
+
   const handleBet = (itemKey: number) => {
     if (isLoadingResult || !isEnoughMoney) return;
     setIsOpenResult(false);
+    setIsRunCounter(false);
     const betValue = isOpenResult ? betValueDefault : betValueState;
     const valueOld = betValue[itemKey] || 0;
     const betValueStateNew = { ...betValue, [itemKey]: valueOld + 1 };
 
-    let sumBet = 0;
-    for (let item = 1; item <= 12; item++) {
-      sumBet += betValueStateNew[item];
-    }
+    let sumBet = getSumbet(betValueStateNew);
+
+    if (isOpenResult) setBetLRValueState(betValueLeftRightDefault);
+
     if (coin - sumBet < 0) {
       setIsEnoughMoney(false);
     } else {
       setBetValueState(betValueStateNew);
+      setCoinMiss(coin - sumBet);
+    }
+  };
+
+  const handleBetLR = (side: number) => {
+    if (isLoadingResult || !isEnoughMoney) return;
+    setIsOpenResult(false);
+    setIsRunCounter(false);
+    const betValue = isOpenResult ? betValueLeftRightDefault : betLRValueState;
+
+    const valueOld = betValue[side] || 0;
+    const betLRStateNew = { ...betValue, [side]: valueOld + 1 };
+    let sumBet = getSumbet(betValueState, betLRStateNew);
+
+    if (isOpenResult) setBetValueState(betValueDefault);
+
+    if (coin - sumBet < 0) {
+      setIsEnoughMoney(false);
+    } else {
+      setBetLRValueState(betLRStateNew);
+
       setCoinMiss(coin - sumBet);
     }
   };
@@ -116,8 +163,10 @@ export const Home = () => {
 
   const clearBet = () => {
     if (isLoadingResult) return;
+    setIsRunCounter(false);
     setCoinMiss(coin);
     setBetValueState(betValueDefault);
+    setBetLRValueState(betValueLeftRightDefault);
     setIsOpenResult(false);
   };
 
@@ -125,7 +174,9 @@ export const Home = () => {
     isStopCallAnimationCoinCounter.current = false;
     setCoinCounter({ ...coinCounter, value: coin });
     let count = 0;
-    const coinReceive = betValueState[result] * multipleNumber;
+    const coinReceive =
+      betValueState[result] * multipleNumber +
+      betLRValueState[result >= 7 ? 2 : 1] * 2;
     const interval = setInterval(() => {
       if (count === coinReceive) {
         setCoinCounter({ ...coinCounter, value: 0 });
@@ -145,7 +196,9 @@ export const Home = () => {
   }
 
   const handleEndBet = (result: number) => {
-    const coinReceive = betValueState[result] * multipleNumber;
+    const coinReceive =
+      betValueState[result] * multipleNumber +
+      betLRValueState[result >= 7 ? 2 : 1] * 2;
     const coinChange = coinMiss + coinReceive;
     setCoin(coinChange);
     setCoinMiss(coinChange);
@@ -186,6 +239,7 @@ export const Home = () => {
   const start = () => {
     if (isLoadingResult) return;
     if (isOpenResult) {
+      setIsRunCounter(false);
       clearBet();
       setIsOpenResult(false);
     }
@@ -251,6 +305,41 @@ export const Home = () => {
     return coinMiss;
   };
 
+  const renderItemBetLeftRight = () => {
+    return (
+      <>
+        <div className="item-wrapper">
+          <div
+            className={classNames("bet-result", {
+              active: betLRValueState[leftSide] > 0,
+              result: !isLoadingResult && isOpenResult && result < 7,
+            })}
+          >
+            {betLRValueState[leftSide]}
+          </div>
+          <div className="button-bet" onClick={() => handleBetLR(leftSide)}>
+            <span className="label">L</span>
+            <img src={images.button_item} alt="item" />
+          </div>
+        </div>
+        <div className="item-wrapper">
+          <div className="button-bet" onClick={() => handleBetLR(rightSide)}>
+            <span className="label">R</span>
+            <img src={images.button_item} alt="item" />
+          </div>
+          <div
+            className={classNames("bet-result", {
+              active: betLRValueState[rightSide] > 0,
+              result: !isLoadingResult && isOpenResult && result >= 7,
+            })}
+          >
+            {betLRValueState[rightSide]}
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div className="wrapper">
       <div className="game-box">
@@ -260,6 +349,7 @@ export const Home = () => {
         <div className="game-top">{renderBetResultScreen()}</div>
         <div className="game-control">
           <div className="start-clear">
+            {renderItemBetLeftRight()}
             <img
               src={images.button_clear}
               onClick={() => clearBet()}
