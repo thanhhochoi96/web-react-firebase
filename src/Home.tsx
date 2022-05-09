@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import images from "./assets/index";
+import media from "./assets/index";
 import classNames from "classnames";
 
 interface BetValueInterface {
@@ -47,6 +47,14 @@ const betResultScreen = new Map([
   [7, "bi bi-star-fill"],
 ]);
 
+const audioElement = new Audio(media.audio.audioRunGame);
+audioElement.loop = true;
+
+const audioClick = new Audio(media.audio.audioClick);
+audioClick.playbackRate = 2;
+
+const audioCoin = new Audio(media.audio.audioCoin);
+
 const coinInitial = 12;
 const multipleNumber = 12;
 
@@ -67,6 +75,7 @@ export const Home = () => {
   const [isRunCounter, setIsRunCounter] = useState(false);
   const [runTurnNumber, setRunTurnNumber] = useState({ value: 1 });
   let timeRunInterval = useRef(80);
+  let showAudio = useRef(1.5);
   let loopNumber = useRef(0);
   let isStopCallAnimationCoinCounter = useRef(true);
 
@@ -85,6 +94,7 @@ export const Home = () => {
   };
 
   const handleBet = (itemKey: number) => {
+    audioClick.play();
     if (isLoadingResult || !isEnoughMoney) return;
     setIsOpenResult(false);
     setIsRunCounter(false);
@@ -105,6 +115,7 @@ export const Home = () => {
   };
 
   const handleBetLR = (side: number) => {
+    audioClick.play();
     if (isLoadingResult || !isEnoughMoney) return;
     setIsOpenResult(false);
     setIsRunCounter(false);
@@ -133,7 +144,7 @@ export const Home = () => {
           <span className="number">
             <i className={betResultScreen.get(item)} />
           </span>
-          <img src={images.button_item} alt="item" />
+          <img src={media.images.button_item} alt="item" />
         </div>
       );
     }
@@ -162,6 +173,7 @@ export const Home = () => {
   };
 
   const clearBet = () => {
+    audioClick.play();
     if (isLoadingResult) return;
     setIsRunCounter(false);
     setCoinMiss(coin);
@@ -177,6 +189,7 @@ export const Home = () => {
     const coinReceive =
       betValueState[result] * multipleNumber +
       betLRValueState[result >= 7 ? 2 : 1] * 2;
+    if (coinReceive !== 0) audioCoin.play();
     const interval = setInterval(() => {
       if (count === coinReceive) {
         setCoinCounter({ ...coinCounter, value: 0 });
@@ -211,14 +224,19 @@ export const Home = () => {
 
   const decreaseTimeInterval = () => {
     timeRunInterval.current += 20;
+    showAudio.current -= 0.05;
   };
 
   const runTurn = (resultNumber: number) => {
+    audioElement.play();
+    audioElement.playbackRate = showAudio.current;
     if (loopNumber.current === 2) decreaseTimeInterval();
     if (runTurnNumber.value === resultNumber) {
       if (loopNumber.current === 3) {
         loopNumber.current = 0;
         timeRunInterval.current = 100;
+        showAudio.current = 1;
+        audioElement.pause();
         setIsLoadingResult(false);
         setIsRunCounter(true);
         return;
@@ -237,6 +255,7 @@ export const Home = () => {
   };
 
   const start = () => {
+    audioClick.play();
     if (isLoadingResult) return;
     if (isOpenResult) {
       setIsRunCounter(false);
@@ -319,13 +338,13 @@ export const Home = () => {
           </div>
           <div className="button-bet" onClick={() => handleBetLR(leftSide)}>
             <span className="label">L</span>
-            <img src={images.button_item} alt="item" />
+            <img src={media.images.button_item} alt="item" />
           </div>
         </div>
         <div className="item-wrapper">
           <div className="button-bet" onClick={() => handleBetLR(rightSide)}>
             <span className="label">R</span>
-            <img src={images.button_item} alt="item" />
+            <img src={media.images.button_item} alt="item" />
           </div>
           <div
             className={classNames("bet-result", {
@@ -351,13 +370,13 @@ export const Home = () => {
           <div className="start-clear">
             {renderItemBetLeftRight()}
             <img
-              src={images.button_clear}
+              src={media.images.button_clear}
               onClick={() => clearBet()}
               className="button_clear"
               alt="button clear"
             />
             <img
-              src={images.button_start}
+              src={media.images.button_start}
               onClick={() => start()}
               className="button_start"
               alt="button start"
