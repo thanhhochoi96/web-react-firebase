@@ -32,19 +32,19 @@ const betValueLeftRightDefault: BetValueInterface = {
 const resultAreaNumber = 13;
 
 const betResultScreen = new Map([
-  [1, "bi bi-alarm-fill"],
-  [2, "bi bi-signpost-fill"],
-  [3, "bi bi-bag-fill"],
-  [4, "bi bi-bell-fill"],
-  [12, "bi bi-suit-heart-fill"],
   [5, "bi bi-square-fill"],
-  [11, "bi bi-camera-reels-fill"],
-  [resultAreaNumber, ""],
   [6, "bi bi-cart-fill"],
-  [10, "bi bi-cloud-fill"],
-  [9, "bi bi-display-fill"],
-  [8, "bi bi-emoji-smile-fill"],
   [7, "bi bi-star-fill"],
+  [8, "bi bi-emoji-smile-fill"],
+  [4, "bi bi-bell-fill"],
+  [9, "bi bi-display-fill"],
+  [3, "bi bi-bag-fill"],
+  [resultAreaNumber, ""],
+  [10, "bi bi-cloud-fill"],
+  [2, "bi bi-signpost-fill"],
+  [1, "bi bi-alarm-fill"],
+  [12, "bi bi-suit-heart-fill"],
+  [11, "bi bi-camera-reels-fill"],
 ]);
 
 const audioElement = new Audio(media.audio.audioRunGame);
@@ -174,6 +174,7 @@ export const Home = () => {
 
   const clearBet = () => {
     audioClick.play();
+    setIsEnoughMoney(true);
     if (isLoadingResult) return;
     setIsRunCounter(false);
     setCoinMiss(coin);
@@ -235,7 +236,7 @@ export const Home = () => {
       if (loopNumber.current === 3) {
         loopNumber.current = 0;
         timeRunInterval.current = 100;
-        showAudio.current = 1;
+        showAudio.current = 1.5;
         audioElement.pause();
         setIsLoadingResult(false);
         setIsRunCounter(true);
@@ -256,6 +257,7 @@ export const Home = () => {
 
   const start = () => {
     audioClick.play();
+    setIsEnoughMoney(true);
     if (isLoadingResult) return;
     if (isOpenResult) {
       setIsRunCounter(false);
